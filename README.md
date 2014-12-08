@@ -9,6 +9,8 @@ Psake tasks and functions for building Hangfire projects with ease, including th
 * Run unit and integration tests from the command line.
 * [AppVeyor](http://www.appveyor.com/) support – build version, pre-release packages for the [project feed](http://www.appveyor.com/docs/nuget#project-feeds) and simple build script.
 
+Please see the Hangfire's [`psake-project.ps1`](https://github.com/HangfireIO/Hangfire/blob/dev/psake-project.ps1) file to see the results.
+ 
 Installation
 -------------
 
@@ -39,7 +41,7 @@ For a full example, you can see the main [Hangfire repository](https://github.co
 
 ### Tasks
 
-For quick overview, sample Hangfire.Build project file is available [here](https://github.com/HangfireIO/Hangfire/blob/dev/psake-build.ps1). Tasks below provide only the base functionality.
+For quick overview, sample Hangfire.Build project file is available [here](https://github.com/HangfireIO/Hangfire/blob/dev/psake-project.ps1). Tasks below provide only the base functionality.
 
 #### `Restore` task
 
