@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Hangfire.Build</id>
+    <version>0.0.0</version>
+    <title>Hangfire.Build</title>
+    <authors>Hangfire Contributors</authors>
+    <owners>odinserj</owners>
+    <projectUrl>http://hangfire.io/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://raw.github.com/HangfireIO/Hangfire.Build/master/LICENSE.md</licenseUrl>
+    <description>
+      Psake tasks and functions to build Hangfire projects with ease.
+    </description>
+    <copyright>Copyright © Sergey Odinokov</copyright>
+    <tags>Hangfire Build Psake Powershell</tags>
+    <releaseNotes>https://github.com/HangfireIO/Hangfire.Build/releases</releaseNotes>
+    <dependencies>
+      <dependency id="psake" version="4.4.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Tools\build.bat" target="tools" />
+	  <file src="Tools\psake-common.ps1" target="tools" />
+    <file src="Tools\psake-project.ps1" target="tools" />
+  </files>
+</package>
