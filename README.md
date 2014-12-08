@@ -22,7 +22,7 @@ This project is being distributed as a NuGet package, so open your Package Manag
 PM> Install-Package Hangfire.Build
 ```
 
-After installing, there are some things to be done. Please go to the `packages\Hangfire.Build.*` folder and copy the following files to the **project root folder**:
+After installing, there are some things to be done. Please go to the `packages\Hangfire.Build.*\tools` folder and copy the following files to the **project root folder**:
 
 * `build.bat` – bootstrapper script you will call to start the build.
 * `psake-project.ps1` – template script for your project, will contain build tasks.
