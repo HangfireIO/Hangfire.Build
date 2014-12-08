@@ -53,7 +53,7 @@ Properties {
 
 Restores all NuGet packages listed in projects in a solution. This is required when you attempt to build the solution and don't want to use MSBuild-Integrated Package restore as it is [not a recommended approach](http://docs.nuget.org/docs/reference/package-restore#MSBuild-Integrated_Package_Restore) since NuGet 2.7.
 
-### `Clean` task
+#### `Clean` task
 
 Cleans the build folder and executes `msbuild /clean` for the solution if given.
 
