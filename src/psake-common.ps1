@@ -78,7 +78,7 @@ function Merge-Assembly($project, $internalizeAssemblies) {
     $projectDir = $project
     $projectAssembly = $project
 
-    if ($project[0]) {
+    if ($project -Is [System.Array]) {
         $projectDir = $project[0]
         $projectAssembly = $project[1]
     }
@@ -130,7 +130,7 @@ function Collect-Assembly($project, $version) {
     $projectDir = $project
     $assembly = $project
 
-    if ($project[0]) {
+    if ($project -Is [System.Array]) {
         $projectDir = $project[0]
         $assembly = $project[1]
     }
