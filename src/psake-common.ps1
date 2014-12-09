@@ -11,7 +11,7 @@ Properties {
 
     ### Tools
     $nuget = "$base_dir\.nuget\nuget.exe"
-    $ilmerge = "$package_dir\ilmerge.*\content\ilmerge.exe"
+    $ilmerge = "$package_dir\ilmerge.*\tools\ilmerge.exe"
     $xunit = "$package_dir\xunit.runners*\tools\xunit.console.clr4.exe"
     $7zip = "$package_dir\7-Zip.CommandLine.*\tools\7za.exe"
 
@@ -75,27 +75,35 @@ function Run-XunitTests($project) {
 ### Merge functions
 
 function Merge-Assembly($project, $internalizeAssemblies) {
-    "Merging '$project' with $internalizeAssemblies..."
+    $projectDir = $project
+    $projectAssembly = $project
+
+    if ($project[0]) {
+        $projectDir = $project[0]
+        $projectAssembly = $project[1]
+    }
+
+    "Merging '$projectAssembly' with $internalizeAssemblies..."
 
     $internalizePaths = @()
 
     foreach ($assembly in $internalizeAssemblies) {
-        $internalizePaths += Get-SrcAssembly $project $assembly
+        $internalizePaths += Get-SrcAssembly $projectDir $assembly
     }
 
-    $primaryAssemblyPath = Get-SrcAssembly $project
+    $primaryAssemblyPath = Get-SrcAssembly $projectDir $projectAssembly
 
     Create-Directory $temp_dir
     
     Exec { .$ilmerge /targetplatform:"v4,$framework_dir" `
-        /out:"$temp_dir\$project.dll" `
+        /out:"$temp_dir\$projectAssembly.dll" `
         /target:library `
         /internalize `
         $primaryAssemblyPath `
         $internalizePaths `
     }
 
-    Move-Files "$temp_dir\$project.*" (Get-SrcOutputDir $project)
+    Move-Files "$temp_dir\$projectAssembly.*" (Get-SrcOutputDir $projectDir)
 }
 
 ### Collect functions
@@ -106,7 +114,7 @@ function Collect-Tool($source) {
     $destination = "$build_dir\Tools"
 
     Create-Directory $destination
-    Copy-Files "$base_dir\$source" $destination
+    Copy-Files "$source" $destination
 }
 
 function Collect-Content($source) {
@@ -115,13 +123,21 @@ function Collect-Content($source) {
     $destination = "$build_dir\Content"
 
     Create-Directory $destination
-    Copy-Files "$base_dir\$source" $destination
+    Copy-Files "$source" $destination
 }
 
 function Collect-Assembly($project, $version) {
-    "Collecting assembly '$project.dll' into '$version'..."
+    $projectDir = $project
+    $assembly = $project
 
-    $source = (Get-SrcOutputDir $project) + "\$project.*"
+    if ($project[0]) {
+        $projectDir = $project[0]
+        $assembly = $project[1]
+    }
+
+    "Collecting assembly '$assembly.dll' into '$version'..."
+
+    $source = (Get-SrcOutputDir $projectDir) + "\$assembly.*"
     $destination = "$build_dir\$version"
 
     Create-Directory $destination
