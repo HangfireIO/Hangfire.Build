@@ -16,7 +16,7 @@ Please see the Hangfire's [`psake-project.ps1`](https://github.com/HangfireIO/Ha
 Installation
 -------------
 
-This project is being distributed as a NuGet package, so open your Package Manager Console window and execute the following command.
+This project is being distributed as a solution-level NuGet package, so open your Package Manager Console window and execute the following command.
 
 ```
 PM> Install-Package Hangfire.Build
