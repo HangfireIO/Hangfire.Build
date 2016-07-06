@@ -161,6 +161,18 @@ function Create-Package($project, $version) {
 
 ### Version functions
 
+function Get-PackageVersion {
+    $version = Get-BuildVersion
+
+	$tag = $env:APPVEYOR_REPO_TAG_NAME
+    if ($tag -And $tag.StartsWith("v$version-")) {
+        "Using tag-based version for packages."
+        $version = $tag.Substring(1)
+    }
+
+    return $version
+}
+
 function Get-BuildVersion {
     $version = Get-SharedVersion
     $buildNumber = $env:APPVEYOR_BUILD_NUMBER
