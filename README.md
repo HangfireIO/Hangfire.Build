@@ -7,6 +7,7 @@ Psake tasks and functions for building Hangfire projects with ease, including th
 
 * Create NuGet packages with all files you want to include.
 * Task to update common version of all projects in solution.
+* Target different frameworks (net45, netstandard1.*, etc).
 * Internalize assemblies with `ILMerge /internalize` (`ILMerge` NuGet package required).
 * Run unit and integration tests from the command line.
 * [AppVeyor](http://www.appveyor.com/) support – build version, pre-release packages for the [project feed](http://www.appveyor.com/docs/nuget#project-feeds) and simple build script.
@@ -86,9 +87,9 @@ Updates `$src_dir\SharedAssemblyInfo.cs` (by default) file's `AssemblyVersion` v
 Requires `xunit.runners` NuGet package installed.
 
 Arguments:
-* *project name*: String.
+* *project*: String.
 
-Executes XUnit runnder for the given project. This function assumes that common project structure is being used, so it looks for the following assembly: `.\tests\<project name>\bin\<configuration>\<project name>.dll`.
+Executes XUnit runner for the given project. This function assumes that common project structure is being used, so it looks for the following assembly: `.\tests\{project}\bin\{configuration}\{project}.dll`.
 
 Example:
 
@@ -96,15 +97,42 @@ Example:
 Run-XunitTests "Hangfire.Core.Tests"
 ```
 
+#### `Run-OpenCover` function
+
+Requires `xunit.runners` and `OpenCover` NuGet package installed.
+
+Arguments:
+* *project*: String.
+* *coverage_file*: String
+* *coverage_filter*: String
+
+Executes OpenCover with XUnit runner for the given project. This function assumes that common project structure is being used, so it looks for the following assembly: `.\tests\{project}\bin\{configuration}\{project}.dll`.
+
+Resulting coverage file is merged with an existing one, so you can use multiple projects to get merged coverage report. Please keep in mind that it is up to you to remove the coverage report file to prevent merging with old reports.
+
+Example:
+
+```
+$coverage_file = "coverage.xml"
+$coverage_filter = "+[Hangfire.*]* -[*.Tests]* -[*]*.Annotations.* -[*]*.Dashboard.* -[*]*.Logging.* -[*]*.ExpressionUtil.*"
+
+Remove-File $coverage_file
+    
+Run-OpenCover "Hangfire.Core.Tests" $coverage_file $coverage_filter
+Run-OpenCover "Hangfire.SqlServer.Tests" $coverage_file $coverage_filter
+Run-OpenCover "Hangfire.SqlServer.Msmq.Tests" $coverage_file $coverage_filter
+```
+
 #### `Merge-Assembly` function
 
 Requires `ILMerge` NuGet package installed.
 
 Arguments:
-* *project name*: String
-* *assembly names*: Array of String – list of assembly names to internalize (with no `.dll` suffix).
+* *project*: String
+* *assemblyies*: Array of String – list of assembly names to internalize (with no `.dll` suffix).
+* *target*: String – target framework
 
-Invokes `ILMerge /internalize` to merge the given assemblies with the project's main assembly. Main assembly file is resolved as `.\src\<project name>\bin\<configuration>\<project name>.dll`. It is assumed that merging assemblies are located under the same folder as a main assembly.
+Invokes `ILMerge /internalize` to merge the given assemblies with the project's main assembly. Main assembly file is resolved as `.\src\{project}\bin\{target}\{configuration}\{project}.*`, `.\src\{project}\bin\{configuration}\{target}\{project}.*` or `.\src\{project}\bin\{configuration}\{project}.*`. It is assumed that merging assemblies are located under the same folder as a main assembly.
 
 After merging, the original project assembly is being overwritted with the result assembly.
 
@@ -118,15 +146,15 @@ Merge-Assembly "Hangfire.Core" @("NCrontab", "CronExpressionDescriptor", "Micros
 
 These function copy build artifacts to the `build` folder to simplify the building of NuGet packages and archive file generation.
 
-**`Collect-Assembly <project name> <sub-folder>`** copies the `*.dll`, `*.xml` and `*.pdb` files to the given build sub-folder. File names are resolved as `.\src\<project name>\bin\<configuration>\<project name>.*`.
+**`Collect-Assembly {project} [{target}]`** copies the `*.dll`, `*.xml` and `*.pdb` files to the given build target folder. File names are resolved as `.\src\{project}\bin\{target}\{configuration}\{project}.*`, `.\src\{project}\bin\{configuration}\{target}\{project}.*` or `.\src\{project}\bin\{configuration}\{project}.*`.
 
-Example: `Collect-Assembly "Hangfire.Core" "Net45"`
+Example: `Collect-Assembly "Hangfire.Core" "net45"`
 
-**`Collect-Content <file>`** copies the given file to the `<build_dir>\Content` folder where `file` is a relative path to the project root.
+**`Collect-Content {file}`** copies the given file to the `{build_dir}\Content` folder where `file` is a relative path to the project root.
 
 Example: `Collect-Content src\Hangfire.SqlServer\Install.sql`
 
-**`Collect-Tool <file>`** copies the given file to the `<build_dir>\Tools` folder where `file` is a relative path to the project root.
+**`Collect-Tool {file}`** copies the given file to the `{build_dir}\Tools` folder where `file` is a relative path to the project root.
 
 #### `Create-Package` function
 
@@ -134,7 +162,7 @@ Arguments:
 * *nuspec* – nuspec filename without path and extension.
 * *version* – the version of a resulting package.
 
-This function executes `nuget pack nuspecs\<nuspec>.nuspec -Symbols` command and places the result into the build folder. Before running `NuGet.exe` executable, it replaces all `0.0.0` substrings in a given nuspec files and replaces them with the given version.
+This function executes `nuget pack nuspecs\{nuspec}.nuspec -Symbols` command and places the result into the build folder. Before running `NuGet.exe` executable, it replaces all `0.0.0` substrings in a given nuspec files and replaces them with the given version.
 
 Example:
 
@@ -162,6 +190,12 @@ Returns the version defined in the `$src_dir\SharedAssemblyInfo.cs` file in `Ass
 #### `Get-BuildVersion` function
 
 Returns the version returned by the `Get-SharedVersion` and adds a pre-release suffix based on AppVeyor CI build number. If `APPVEYOR_REPO_TAG` environment variable is set, **no pre-release suffix** is being appended. Build number is being padded with `0` symbols.
+
+#### `Get-PackageVersion` function
+
+If called from a build on AppVeyor, triggered by an added tag that starts with "v$version", where $version is the same as returned by a `Get-BuildVersion` function (for safety reasons), then returns the rest of a tag, without the "v" letter. Otherwise returns build version.
+
+For example, if you triggered a build by adding a tag `v1.6.0-beta4`, and current version in your `SharedAssemblyInfo.cs` file is `1.6.0`, then this function returns `1.6.0-beta4`. If your assembly info version is `1.5.0`, then `1.5.0` version is returned to prevent building newer versions by an accident.
 
 Examples:
 
