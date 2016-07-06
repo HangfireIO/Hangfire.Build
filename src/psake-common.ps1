@@ -166,7 +166,8 @@ function Get-BuildVersion {
     $buildNumber = $env:APPVEYOR_BUILD_NUMBER
 
     if ($env:APPVEYOR_REPO_TAG -ne "True" -And $buildNumber -ne $null) {
-        $version += "-build-" + $buildNumber.ToString().PadLeft(5, '0')
+        "Using CI build version."
+        $version += "-" + $buildNumber.ToString().PadLeft(5, '0')
     }
 
     return $version
