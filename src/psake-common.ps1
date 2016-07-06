@@ -131,7 +131,7 @@ function Merge-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $tar
         $internalizePaths `
     }
 
-    Move-Files "$temp_dir\$project.*" (Get-SrcOutputDir $project $target)
+    Move-Files "$temp_dir\$project.*" $projectOutput
 }
 
 ### Collect functions
