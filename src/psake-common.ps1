@@ -6,7 +6,7 @@ Properties {
     $tests_dir = "$base_dir\tests"
     $package_dir = "$base_dir\packages"
     $nuspec_dir = "$base_dir\nuspecs"
-    $temp_dir = "$build_dir\Temp"
+    $temp_dir = "$build_dir\temp"
     $framework_dir =  $env:windir + "\Microsoft.Net\Framework\v4.0.30319"
 
     ### Tools
@@ -14,6 +14,7 @@ Properties {
     $ilmerge = "$package_dir\ilmerge.*\tools\ilmerge.exe"
     $xunit = "$package_dir\xunit.runners*\tools\xunit.console.clr4.exe"
     $7zip = "$package_dir\7-Zip.CommandLine.*\tools\7za.exe"
+    $opencover = "$package_dir\OpenCover.*\opencover.console.exe"
 
     ### AppVeyor-related
     $appVeyorConfig = "$base_dir\appveyor.yml"
@@ -62,8 +63,8 @@ Task Version -Description "Patch AssemblyInfo and AppVeyor version files." {
 
 ### Test functions
 
-function Run-XunitTests($project) {
-    $assembly = Get-Assembly $tests_dir $project
+function Run-XunitTests($project, $target) {
+    $assembly = (Get-TestsOutputDir $project $target) + "\$project.dll"
 
     if ($appVeyor) {
         Exec { xunit.console.clr4 $assembly /appveyor }
@@ -72,38 +73,65 @@ function Run-XunitTests($project) {
     }
 }
 
-### Merge functions
+function Run-OpenCover($projectWithOptionalTarget, $coverageFile, $coverageFilter) {
+    $project = $projectWithOptionalTarget
+    $target = $null
 
-function Merge-Assembly($project, $internalizeAssemblies) {
-    $projectDir = $project
-    $projectAssembly = $project
-
-    if ($project -Is [System.Array]) {
-        $projectDir = $project[0]
-        $projectAssembly = $project[1]
+    if ($projectWithOptionalTarget -Is [System.Array]) {
+        $project = $projectWithOptionalTarget[0]
+        $target = $projectWithOptionalTarget[1]
     }
 
-    "Merging '$projectAssembly' with $internalizeAssemblies..."
+    if ($env:APPVEYOR) {
+        $xunit_path = Get-Command "xunit.console.clr4.exe" | Select-Object -ExpandProperty Definition
+        $extra = "/appveyor"
+    }
+    else {
+        # We need to use paths without asterisks here
+        $xunit_path = Resolve-Path $xunit
+    }
+
+    $assembly = (Get-TestsOutputDir $project $target) + "\$project.dll"
+
+    Exec {        
+        .$opencover `"-target:$xunit_path`" `"-targetargs:$assembly /noshadow $extra`" `"-filter:$coverageFilter`" -mergeoutput `"-output:$coverageFile`" -register:user -returntargetcode
+    }
+}
+
+### Merge functions
+
+function Merge-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $target) {
+    $project = $projectWithOptionalTarget
+    $target = $null
+
+    if ($projectWithOptionalTarget -Is [System.Array]) {
+        $project = $projectWithOptionalTarget[0]
+        $target = $projectWithOptionalTarget[1]
+    }
+
+    "Merging '$project' with $internalizeAssemblies..."
 
     $internalizePaths = @()
 
+    $projectOutput = Get-SrcOutputDir $project $target
+
     foreach ($assembly in $internalizeAssemblies) {
-        $internalizePaths += Get-SrcAssembly $projectDir $assembly
+        $internalizePaths += "$projectOutput\$assembly.dll"
     }
 
-    $primaryAssemblyPath = Get-SrcAssembly $projectDir $projectAssembly
+    $primaryAssemblyPath = "$projectOutput\$project.dll"
 
     Create-Directory $temp_dir
     
     Exec { .$ilmerge /targetplatform:"v4,$framework_dir" `
-        /out:"$temp_dir\$projectAssembly.dll" `
+        /out:"$temp_dir\$project.dll" `
         /target:library `
         /internalize `
         $primaryAssemblyPath `
         $internalizePaths `
     }
 
-    Move-Files "$temp_dir\$projectAssembly.*" (Get-SrcOutputDir $projectDir)
+    Move-Files "$temp_dir\$project.*" (Get-SrcOutputDir $project $target)
 }
 
 ### Collect functions
@@ -111,7 +139,7 @@ function Merge-Assembly($project, $internalizeAssemblies) {
 function Collect-Tool($source) {
     "Collecting tool '$source'..."
 
-    $destination = "$build_dir\Tools"
+    $destination = "$build_dir\tools"
 
     Create-Directory $destination
     Copy-Files "$source" $destination
@@ -120,25 +148,17 @@ function Collect-Tool($source) {
 function Collect-Content($source) {
     "Collecting content '$source'..."
 
-    $destination = "$build_dir\Content"
+    $destination = "$build_dir\content"
 
     Create-Directory $destination
     Copy-Files "$source" $destination
 }
 
-function Collect-Assembly($project, $version) {
-    $projectDir = $project
-    $assembly = $project
-
-    if ($project -Is [System.Array]) {
-        $projectDir = $project[0]
-        $assembly = $project[1]
-    }
-
-    "Collecting assembly '$assembly.dll' into '$version'..."
-
-    $source = (Get-SrcOutputDir $projectDir) + "\$assembly.*"
-    $destination = "$build_dir\$version"
+function Collect-Assembly($project, $target) {
+    "Collecting assembly '$target/$project'..."
+    
+    $source = (Get-SrcOutputDir $project $target) + "\$project.*"
+    $destination = "$build_dir\$target"
 
     Create-Directory $destination
     Copy-Files $source $destination
@@ -246,6 +266,13 @@ function Clean-Directory($dir) {
     }
 }
 
+function Remove-File($file) {
+    if (Test-Path $file) {
+        "Removing '$file'..."
+        Remove-Item $file -Force
+    }
+}
+
 function Remove-Directory($dir) {
     if (Test-Path $dir) {
         "Removing '$dir'..."
@@ -265,21 +292,30 @@ function Replace-Content($file, $pattern, $substring) {
     (gc $file) -Replace $pattern, $substring | sc $file
 }
 
-function Get-SrcAssembly($project, $assembly) {
-    return Get-Assembly $src_dir $project $assembly
+function Get-SrcOutputDir($project, $target) {
+    $result = _Get-OutputDir $src_dir $project $target
+
+    Write-Host "  Using directory $result" -ForegroundColor "DarkGray"
+    return $result
 }
 
-function Get-SrcOutputDir($project) {
-    return Get-OutputDir $src_dir $project
+function Get-TestsOutputDir($project, $target) {
+    $result = _Get-OutputDir $tests_dir $project $target
+
+    Write-Host "  Using directory $result" -ForegroundColor "DarkGray"
+    return $result
 }
 
-function Get-Assembly($dir, $project, $assembly) {
-    if (!$assembly) { 
-        $assembly = $project 
+function _Get-OutputDir($dir, $project, $target) {
+    $baseDir = "$dir\$project\bin"
+    
+    if ($target -And (Test-Path "$baseDir\$target\$config")) {
+        return "$baseDir\$target\$config"
     }
-    return (Get-OutputDir $dir $project) + "\$assembly.dll"
-}
 
-function Get-OutputDir($dir, $project) {
-    return "$dir\$project\bin\$config"
+    if ($target -And (Test-Path "$baseDir\$config\$target")) {
+        return "$baseDir\$config\$target"
+    }
+
+    return "$baseDir\$config"
 }
