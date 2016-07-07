@@ -29,7 +29,7 @@ Properties {
 ## Tasks
 
 Task Restore -Description "Restore NuGet packages for solution." {
-    "Restoring NuGet packages for '$solution'..."
+    Write-Host "Restoring NuGet packages for '$solution'..." -ForegroundColor "Green"
     Exec { .$nuget restore $solution }
 }
 
@@ -37,13 +37,13 @@ Task Clean -Description "Clean up build and project folders." {
     Clean-Directory $build_dir
 
     if ($solution) {
-        "Cleaning up '$solution'..."
+        Write-Host "Cleaning up '$solution'..." -ForegroundColor "Green"
         Exec { msbuild $solution_path /target:Clean /nologo /verbosity:minimal }
     }
 }
 
 Task Compile -Depends Clean, Restore -Description "Compile all the projects in a solution." {
-    "Compiling '$solution'..."
+    Write-Host "Compiling '$solution'..." -ForegroundColor "Green"
 
     $extra = $null
     if ($appVeyor) {
@@ -64,6 +64,7 @@ Task Version -Description "Patch AssemblyInfo and AppVeyor version files." {
 ### Test functions
 
 function Run-XunitTests($project, $target) {
+    Write-Host "Running xUnit test runner for '$project'..." -ForegroundColor "Green"
     $assembly = (Get-TestsOutputDir $project $target) + "\$project.dll"
 
     if ($appVeyor) {
@@ -91,6 +92,7 @@ function Run-OpenCover($projectWithOptionalTarget, $coverageFile, $coverageFilte
         $xunit_path = Resolve-Path $xunit
     }
 
+    Write-Host "Running OpenCover/xUnit for '$project'..." -ForegroundColor "Green"
     $assembly = (Get-TestsOutputDir $project $target) + "\$project.dll"
 
     Exec {        
@@ -109,7 +111,7 @@ function Merge-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $tar
         $target = $projectWithOptionalTarget[1]
     }
 
-    "Merging '$project' with $internalizeAssemblies..."
+    Write-Host "Merging '$project' with $internalizeAssemblies..." -ForegroundColor "Green"
 
     $internalizePaths = @()
 
@@ -137,7 +139,7 @@ function Merge-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $tar
 ### Collect functions
 
 function Collect-Tool($source) {
-    "Collecting tool '$source'..."
+    Write-Host "Collecting tool '$source'..." -ForegroundColor "Green"
 
     $destination = "$build_dir\tools"
 
@@ -146,7 +148,7 @@ function Collect-Tool($source) {
 }
 
 function Collect-Content($source) {
-    "Collecting content '$source'..."
+    Write-Host "Collecting content '$source'..." -ForegroundColor "Green"
 
     $destination = "$build_dir\content"
 
@@ -155,7 +157,7 @@ function Collect-Content($source) {
 }
 
 function Collect-Assembly($project, $target) {
-    "Collecting assembly '$target/$project'..."
+    Write-Host "Collecting assembly '$target/$project'..." -ForegroundColor "Green"
     
     $source = (Get-SrcOutputDir $project $target) + "\$project.*"
     $destination = "$build_dir\$target"
@@ -186,8 +188,8 @@ function Get-PackageVersion {
 
 	$tag = $env:APPVEYOR_REPO_TAG_NAME
     if ($tag -And $tag.StartsWith("v$version-")) {
-        "Using tag-based version for packages."
         $version = $tag.Substring(1)
+        Write-Host "Using tag-based version '$version' for packages..." -ForegroundColor "Green"
     }
 
     return $version
@@ -198,8 +200,8 @@ function Get-BuildVersion {
     $buildNumber = $env:APPVEYOR_BUILD_NUMBER
 
     if ($env:APPVEYOR_REPO_TAG -ne "True" -And $buildNumber -ne $null) {
-        "Using CI build version."
         $version += "-" + $buildNumber.ToString().PadLeft(5, '0')
+        Write-Host "Using CI build version '$version'..." -ForegroundColor "Green"
     }
 
     return $version
@@ -217,7 +219,7 @@ function Update-SharedVersion($version) {
     $versionAssembly = 'AssemblyVersion("' + $version + '")';
 
     if (Test-Path $sharedAssemblyInfo) {
-        "Patching $sharedAssemblyInfo..."
+        Write-Host "Patching '$sharedAssemblyInfo'..." -ForegroundColor "Green"
         Replace-Content "$sharedAssemblyInfo" $versionPattern $versionAssembly
     }
 }
@@ -229,7 +231,7 @@ function Update-AppveyorVersion($version) {
     $versionReplace = "version: $version"
 
     if (Test-Path $appVeyorConfig) {
-        "Patching $appVeyorConfig..."
+        Write-Host "Patching '$appVeyorConfig'..." -ForegroundColor "Green"
         Replace-Content "$appVeyorConfig" $versionPattern $versionReplace
     }
 }
@@ -261,21 +263,21 @@ function Create-Directory($dir) {
 
 function Clean-Directory($dir) {
     If (Test-Path $dir) {
-        "Cleaning up '$dir'..."
+        Write-Host "Cleaning up '$dir'..." -ForegroundColor "DarkGray"
         Remove-Item "$dir\*" -Recurse -Force
     }
 }
 
 function Remove-File($file) {
     if (Test-Path $file) {
-        "Removing '$file'..."
+        Write-Host "Removing '$file'..." -ForegroundColor "DarkGray"
         Remove-Item $file -Force
     }
 }
 
 function Remove-Directory($dir) {
     if (Test-Path $dir) {
-        "Removing '$dir'..."
+        Write-Host "Removing '$dir'..." -ForegroundColor "DarkGray"
         Remove-Item $dir -Recurse -Force
     }
 }
