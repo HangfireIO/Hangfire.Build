@@ -169,6 +169,8 @@ function Collect-Assembly($project, $target) {
 ### Pack functions
 
 function Create-Package($project, $version) {
+    Write-Host "Creating NuGet package for '$project'..." -ForegroundColor "Green"
+
     Create-Directory $temp_dir
     Copy-Files "$nuspec_dir\$project.nuspec" $temp_dir
 
@@ -245,6 +247,7 @@ function Check-Version($version) {
 ### Archive functions
 
 function Create-Archive($name) {
+    Write-Host "Creating archive '$name.zip'..." -ForegroundColor "Green"
     Remove-Directory $temp_dir
     Create-Zip "$build_dir\$name.zip" "$build_dir"
 }
