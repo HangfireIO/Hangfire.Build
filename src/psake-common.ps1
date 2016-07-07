@@ -174,7 +174,7 @@ function Create-Package($project, $version) {
 
     Try {
         Replace-Content "$nuspec_dir\$project.nuspec" '0.0.0' $version
-        Exec { .$nuget pack "$nuspec_dir\$project.nuspec" -OutputDirectory "$build_dir" -BasePath "$build_dir" -Version $version -Symbols }
+        Exec { .$nuget pack "$nuspec_dir\$project.nuspec" -OutputDirectory "$build_dir" -BasePath "$build_dir" -Version "$version" -Symbols }
     }
     Finally {
         Move-Files "$temp_dir\$project.nuspec" $nuspec_dir
