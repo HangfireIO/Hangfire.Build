@@ -166,6 +166,15 @@ function Collect-Assembly($project, $target) {
     Copy-Files $source $destination
 }
 
+function Collect-File($source) {
+    Write-Host "Collecting file '$source'..." -ForegroundColor "Green"
+
+    $destination = $build_dir;
+
+    Create-Directory $destination
+    Copy-Files $source $destination
+}
+
 ### Pack functions
 
 function Create-Package($project, $version) {
