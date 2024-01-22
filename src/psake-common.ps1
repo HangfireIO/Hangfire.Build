@@ -28,11 +28,6 @@ Properties {
 
 ## Tasks
 
-Task Restore -Description "Restore NuGet packages for solution." {
-    Write-Host "Restoring NuGet packages for '$solution'..." -ForegroundColor "Green"
-    Exec { .$nuget restore $solution }
-}
-
 Task Clean -Description "Clean up build and project folders." {
     Clean-Directory $build_dir
 
@@ -42,7 +37,7 @@ Task Clean -Description "Clean up build and project folders." {
     }
 }
 
-Task Compile -Depends Clean, Restore -Description "Compile all the projects in a solution." {
+Task Compile -Depends Clean -Description "Compile all the projects in a solution." {
     Write-Host "Compiling '$solution'..." -ForegroundColor "Green"
 
     $extra = $null
