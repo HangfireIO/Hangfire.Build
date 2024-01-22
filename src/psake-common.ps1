@@ -33,7 +33,7 @@ Task Clean -Description "Clean up build and project folders." {
 
     if ($solution) {
         Write-Host "Cleaning up '$solution'..." -ForegroundColor "Green"
-        Exec { msbuild $solution_path /target:Clean /nologo /verbosity:minimal }
+        Exec { dotnet clean -c $config -nologo -verbosity:minimal }
     }
 }
 
@@ -42,10 +42,10 @@ Task Compile -Depends Clean -Description "Compile all the projects in a solution
 
     $extra = $null
     if ($appVeyor) {
-        $extra = "/logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+        $extra = "-logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
     }
 
-    Exec { msbuild $solution_path /p:Configuration=$config /nologo /verbosity:minimal $extra }
+    Exec { dotnet build -c $config -nologo -verbosity:minimal $extra }
 }
 
 Task Version -Description "Patch AssemblyInfo and AppVeyor version files." {
