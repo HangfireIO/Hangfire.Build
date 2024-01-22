@@ -21,7 +21,6 @@ Properties {
     $appVeyor = $env:APPVEYOR
 
     ### Project information
-    $solution_path = "$base_dir\$solution"
     $config = "Release"    
     $sharedAssemblyInfo = "$src_dir\SharedAssemblyInfo.cs"
 }
@@ -31,14 +30,12 @@ Properties {
 Task Clean -Description "Clean up build and project folders." {
     Clean-Directory $build_dir
 
-    if ($solution) {
-        Write-Host "Cleaning up '$solution'..." -ForegroundColor "Green"
-        Exec { dotnet clean -c $config -nologo -verbosity:minimal }
-    }
+    Write-Host "Cleaning up the solution..." -ForegroundColor "Green"
+    Exec { dotnet clean -c $config -nologo -verbosity:minimal }
 }
 
 Task Compile -Depends Clean -Description "Compile all the projects in a solution." {
-    Write-Host "Compiling '$solution'..." -ForegroundColor "Green"
+    Write-Host "Compiling the solution..." -ForegroundColor "Green"
 
     $extra = $null
     if ($appVeyor) {
