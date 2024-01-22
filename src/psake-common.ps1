@@ -1,27 +1,27 @@
 Properties {
     ### Directories
     $base_dir = resolve-path .
-    $build_dir = "$base_dir\build"
-    $src_dir = "$base_dir\src"
-    $tests_dir = "$base_dir\tests"
-    $package_dir = "$base_dir\packages"
-    $nuspec_dir = "$base_dir\nuspecs"
-    $temp_dir = "$build_dir\temp"
+    $build_dir = "$base_dir/build"
+    $src_dir = "$base_dir/src"
+    $tests_dir = "$base_dir/tests"
+    $package_dir = "$base_dir/packages"
+    $nuspec_dir = "$base_dir/nuspecs"
+    $temp_dir = "$build_dir/temp"
 
     ### Tools
-    $nuget = "$base_dir\.nuget\nuget.exe"
-    $ilrepack = "$package_dir\ilrepack.*\tools\ilrepack.exe"
-    $xunit = "$package_dir\xunit.runners*\tools\xunit.console.clr4.exe"
-    $7zip = "$package_dir\7-Zip.CommandLine.*\tools\7za.exe"
-    $opencover = "$package_dir\OpenCover.*\opencover.console.exe"
+    $nuget = "$base_dir/.nuget/nuget.exe"
+    $ilrepack = "$package_dir/ilrepack.*/tools/ilrepack.exe"
+    $xunit = "$package_dir/xunit.runners*/tools/xunit.console.clr4.exe"
+    $7zip = "$package_dir/7-Zip.CommandLine.*/tools/7za.exe"
+    $opencover = "$package_dir/OpenCover.*/opencover.console.exe"
 
     ### AppVeyor-related
-    $appVeyorConfig = "$base_dir\appveyor.yml"
+    $appVeyorConfig = "$base_dir/appveyor.yml"
     $appVeyor = $env:APPVEYOR
 
     ### Project information
     $config = "Release"    
-    $sharedAssemblyInfo = "$src_dir\SharedAssemblyInfo.cs"
+    $sharedAssemblyInfo = "$src_dir/SharedAssemblyInfo.cs"
 }
 
 ## Tasks
@@ -40,7 +40,7 @@ Task Compile -Depends Clean -Description "Compile all the projects in a solution
 
     $extra = $null
     if ($appVeyor) {
-        $extra = "-logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+        $extra = "-logger:C:/Program Files/AppVeyor/BuildAgent/Appveyor.MSBuildLogger.dll"
     }
 
     Exec { dotnet build -c $config -nologo -verbosity:minimal $extra }
@@ -58,7 +58,7 @@ Task Version -Description "Patch AssemblyInfo and AppVeyor version files." {
 
 function Run-XunitTests($project, $target) {
     Write-Host "Running xUnit test runner for '$project'..." -ForegroundColor "Green"
-    $assembly = (Get-TestsOutputDir $project $target) + "\$project.dll"
+    $assembly = (Get-TestsOutputDir $project $target) + "/$project.dll"
 
     if ($appVeyor) {
         Exec { xunit.console.clr4 $assembly /appveyor }
@@ -86,7 +86,7 @@ function Run-OpenCover($projectWithOptionalTarget, $coverageFile, $coverageFilte
     }
 
     Write-Host "Running OpenCover/xUnit for '$project'..." -ForegroundColor "Green"
-    $assembly = (Get-TestsOutputDir $project $target) + "\$project.dll"
+    $assembly = (Get-TestsOutputDir $project $target) + "/$project.dll"
 
     Exec {        
         .$opencover `"-target:$xunit_path`" `"-targetargs:$assembly /noshadow $extra`" `"-filter:$coverageFilter`" -mergeoutput `"-output:$coverageFile`" -register:user -returntargetcode
@@ -122,7 +122,7 @@ function Repack-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $ta
     Set-Location -Path $projectOutput
 
     Exec { .$ilrepack `
-        /out:"$temp_dir\$project.dll" `
+        /out:"$temp_dir/$project.dll" `
         /target:library `
         /internalize `
         $primaryAssemblyPath `
@@ -131,7 +131,7 @@ function Repack-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $ta
 
     Pop-Location
 
-    Move-Files "$temp_dir\$project.*" $projectOutput
+    Move-Files "$temp_dir/$project.*" $projectOutput
 }
 
 ### Collect functions
@@ -139,7 +139,7 @@ function Repack-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $ta
 function Collect-Tool($source) {
     Write-Host "Collecting tool '$source'..." -ForegroundColor "Green"
 
-    $destination = "$build_dir\tools"
+    $destination = "$build_dir/tools"
 
     Create-Directory $destination
     Copy-Files "$source" $destination
@@ -148,7 +148,7 @@ function Collect-Tool($source) {
 function Collect-Content($source) {
     Write-Host "Collecting content '$source'..." -ForegroundColor "Green"
 
-    $destination = "$build_dir\content"
+    $destination = "$build_dir/content"
 
     Create-Directory $destination
     Copy-Files "$source" $destination
@@ -157,8 +157,8 @@ function Collect-Content($source) {
 function Collect-Assembly($project, $target) {
     Write-Host "Collecting assembly '$target/$project'..." -ForegroundColor "Green"
     
-    $source = (Get-SrcOutputDir $project $target) + "\$project.*"
-    $destination = "$build_dir\$target"
+    $source = (Get-SrcOutputDir $project $target) + "/$project.*"
+    $destination = "$build_dir/$target"
 
     Create-Directory $destination
     Copy-Files $source $destination
@@ -171,12 +171,12 @@ function Collect-Localizations($project, $target) {
     $dirs = Get-ChildItem -Path $output -Directory
 
     foreach ($dir in $dirs) {
-        $source = "$output\$dir\$project.resources.dll"
+        $source = "$output/$dir/$project.resources.dll"
 
         if (Test-Path $source) {
             Write-Host "  Collecting '$dir' localization..."
 
-            $destination = "$build_dir\$target\$dir"
+            $destination = "$build_dir/$target/$dir"
 
             Create-Directory $destination
             Copy-Files $source $destination
@@ -199,19 +199,19 @@ function Create-Package($project, $version) {
     Write-Host "Creating NuGet package for '$project'..." -ForegroundColor "Green"
 
     Create-Directory $temp_dir
-    Copy-Files "$nuspec_dir\$project.nuspec" $temp_dir
+    Copy-Files "$nuspec_dir/$project.nuspec" $temp_dir
 
     $commit = (git rev-parse HEAD)
 
     Try {
         Write-Host "Patching version with '$version'..." -ForegroundColor "DarkGray"
-        Replace-Content "$nuspec_dir\$project.nuspec" '%version%' $version
+        Replace-Content "$nuspec_dir/$project.nuspec" '%version%' $version
         Write-Host "Patching commit hash with '$commit'..." -ForegroundColor "DarkGray"
-        Replace-Content "$nuspec_dir\$project.nuspec" '%commit%' $commit
-        Exec { .$nuget pack "$nuspec_dir\$project.nuspec" -OutputDirectory "$build_dir" -BasePath "$build_dir" -Version "$version" }
+        Replace-Content "$nuspec_dir/$project.nuspec" '%commit%' $commit
+        Exec { .$nuget pack "$nuspec_dir/$project.nuspec" -OutputDirectory "$build_dir" -BasePath "$build_dir" -Version "$version" }
     }
     Finally {
-        Move-Files "$temp_dir\$project.nuspec" $nuspec_dir
+        Move-Files "$temp_dir/$project.nuspec" $nuspec_dir
     }
 }
 
@@ -281,13 +281,13 @@ function Check-Version($version) {
 function Create-Archive($name) {
     Write-Host "Creating archive '$name.zip'..." -ForegroundColor "Green"
     Remove-Directory $temp_dir
-    Create-Zip "$build_dir\$name.zip" "$build_dir"
+    Create-Zip "$build_dir/$name.zip" "$build_dir"
 }
 
 function Create-Zip($file, $dir){
     if (Test-Path -path $file) { Remove-Item $file }
     Create-Directory $dir
-    Exec { & $7zip a -mx -tzip $file $dir\* } 
+    Exec { & $7zip a -mx -tzip $file $dir/* } 
 }
 
 ### Common functions
@@ -299,7 +299,7 @@ function Create-Directory($dir) {
 function Clean-Directory($dir) {
     If (Test-Path $dir) {
         Write-Host "Cleaning up '$dir'..." -ForegroundColor "DarkGray"
-        Remove-Item "$dir\*" -Recurse -Force
+        Remove-Item "$dir/*" -Recurse -Force
     }
 }
 
@@ -344,15 +344,15 @@ function Get-TestsOutputDir($project, $target) {
 }
 
 function _Get-OutputDir($dir, $project, $target) {
-    $baseDir = "$dir\$project\bin"
+    $baseDir = "$dir/$project/bin"
     
-    if ($target -And (Test-Path "$baseDir\$target\$config")) {
-        return "$baseDir\$target\$config"
+    if ($target -And (Test-Path "$baseDir/$target/$config")) {
+        return "$baseDir/$target/$config"
     }
 
-    if ($target -And (Test-Path "$baseDir\$config\$target")) {
-        return "$baseDir\$config\$target"
+    if ($target -And (Test-Path "$baseDir/$config/$target")) {
+        return "$baseDir/$config/$target"
     }
 
-    return "$baseDir\$config"
+    return "$baseDir/$config"
 }
