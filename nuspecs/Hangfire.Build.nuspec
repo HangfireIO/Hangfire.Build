@@ -2,11 +2,12 @@
 <package >
   <metadata>
     <id>Hangfire.Build</id>
-    <version>0.0.0</version>
+    <version>%version%</version>
     <title>Hangfire.Build</title>
     <authors>Hangfire Contributors</authors>
     <owners>odinserj</owners>
     <projectUrl>https://github.com/HangfireIO/Hangfire.Build</projectUrl>
+    <repository type="git" url="https://github.com/HangfireIO/Hangfire.Build.git" commit="%commit%" />
     <license type="expression">MIT</license>
     <description>
       Psake tasks and functions to build Hangfire projects with ease.

@@ -177,9 +177,14 @@ function Create-Package($project, $version) {
     Create-Directory $temp_dir
     Copy-Files "$nuspec_dir\$project.nuspec" $temp_dir
 
+    $commit = (git rev-parse HEAD)
+
     Try {
-        Replace-Content "$nuspec_dir\$project.nuspec" '0.0.0' $version
-        Exec { .$nuget pack "$nuspec_dir\$project.nuspec" -OutputDirectory "$build_dir" -BasePath "$build_dir" -Version "$version" -Symbols }
+        Write-Host "Patching version with '$version'..." -ForegroundColor "DarkGray"
+        Replace-Content "$nuspec_dir\$project.nuspec" '%version%' $version
+        Write-Host "Patching commit hash with '$commit'..." -ForegroundColor "DarkGray"
+        Replace-Content "$nuspec_dir\$project.nuspec" '%commit%' $commit
+        Exec { .$nuget pack "$nuspec_dir\$project.nuspec" -OutputDirectory "$build_dir" -BasePath "$build_dir" -Version "$version" }
     }
     Finally {
         Move-Files "$temp_dir\$project.nuspec" $nuspec_dir
