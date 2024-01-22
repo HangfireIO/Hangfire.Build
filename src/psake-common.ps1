@@ -160,6 +160,26 @@ function Collect-Assembly($project, $target) {
     Copy-Files $source $destination
 }
 
+function Collect-Localizations($project, $target) {
+    Write-Host "Collecting localizations for '$target/$project'..." -ForegroundColor "Green"
+    
+    $output = (Get-SrcOutputDir $project $target)
+    $dirs = Get-ChildItem -Path $output -Directory
+
+    foreach ($dir in $dirs) {
+        $source = "$output\$dir\$project.resources.dll"
+
+        if (Test-Path $source) {
+            Write-Host "  Collecting '$dir' localization..."
+
+            $destination = "$build_dir\$target\$dir"
+
+            Create-Directory $destination
+            Copy-Files $source $destination
+        }
+    }
+}
+
 function Collect-File($source) {
     Write-Host "Collecting file '$source'..." -ForegroundColor "Green"
 
