@@ -2,7 +2,7 @@ Include "src\psake-common.ps1"
 
 Task Default -Depends Pack
 
-Task Collect -Depends Clean -Description "Copy all artifacts to the build folder." {
+Task Collect -Depends CleanBuild -Description "Copy all artifacts to the build folder." {
     Collect-Tool "src\psake-common.ps1"
     Collect-Tool "src\psake-project.ps1"
     Collect-Tool "build.bat"

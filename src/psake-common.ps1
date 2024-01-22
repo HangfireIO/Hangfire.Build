@@ -27,9 +27,11 @@ Properties {
 
 ## Tasks
 
-Task Clean -Description "Clean up build and project folders." {
+Task CleanBuild -Description "Clean up the build directory." {
     Clean-Directory $build_dir
+}
 
+Task Clean -Depends CleanBuild -Description "Clean up the project directories." {
     Write-Host "Cleaning up the solution..." -ForegroundColor "Green"
     Exec { dotnet clean -c $config -nologo -verbosity:minimal }
 }
