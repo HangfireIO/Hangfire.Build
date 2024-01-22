@@ -39,9 +39,9 @@ Task Compile -Depends Clean -Description "Compile all the projects in a solution
     Write-Host "Compiling the solution..." -ForegroundColor "Green"
 
     $extra = $null
-    if ($appVeyor) {
-        $extra = "-logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-    }
+    #if ($appVeyor) {
+    #    $extra = "-logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+    #}
 
     Exec { dotnet build -c $config -nologo -verbosity:minimal $extra }
 }
