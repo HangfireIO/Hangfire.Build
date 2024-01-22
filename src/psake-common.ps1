@@ -7,11 +7,10 @@ Properties {
     $package_dir = "$base_dir\packages"
     $nuspec_dir = "$base_dir\nuspecs"
     $temp_dir = "$build_dir\temp"
-    $framework_dir =  $env:windir + "\Microsoft.Net\Framework\v4.0.30319"
 
     ### Tools
     $nuget = "$base_dir\.nuget\nuget.exe"
-    $ilmerge = "$package_dir\ilmerge.*\tools\ilmerge.exe"
+    $ilrepack = "$package_dir\ilrepack.*\tools\ilrepack.exe"
     $xunit = "$package_dir\xunit.runners*\tools\xunit.console.clr4.exe"
     $7zip = "$package_dir\7-Zip.CommandLine.*\tools\7za.exe"
     $opencover = "$package_dir\OpenCover.*\opencover.console.exe"
@@ -96,7 +95,7 @@ function Run-OpenCover($projectWithOptionalTarget, $coverageFile, $coverageFilte
 
 ### Merge functions
 
-function Merge-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $target) {
+function Repack-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $target) {
     $project = $projectWithOptionalTarget
     $target = $null
 
@@ -105,27 +104,32 @@ function Merge-Assembly($projectWithOptionalTarget, $internalizeAssemblies, $tar
         $target = $projectWithOptionalTarget[1]
     }
 
-    Write-Host "Merging '$project' with $internalizeAssemblies..." -ForegroundColor "Green"
+    Write-Host "Repacking '$project'/$target with $internalizeAssemblies..." -ForegroundColor "Green"
 
     $internalizePaths = @()
 
     $projectOutput = Get-SrcOutputDir $project $target
 
     foreach ($assembly in $internalizeAssemblies) {
-        $internalizePaths += "$projectOutput\$assembly.dll"
+        $internalizePaths += "$assembly.dll"
     }
 
-    $primaryAssemblyPath = "$projectOutput\$project.dll"
+    $primaryAssemblyPath = "$project.dll"
 
     Create-Directory $temp_dir
-    
-    Exec { .$ilmerge /targetplatform:"v4,$framework_dir" `
+
+    Push-Location
+    Set-Location -Path $projectOutput
+
+    Exec { .$ilrepack `
         /out:"$temp_dir\$project.dll" `
         /target:library `
         /internalize `
         $primaryAssemblyPath `
         $internalizePaths `
     }
+
+    Pop-Location
 
     Move-Files "$temp_dir\$project.*" $projectOutput
 }
