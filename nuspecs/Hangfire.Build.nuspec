@@ -7,11 +7,11 @@
     <authors>Hangfire Contributors</authors>
     <owners>odinserj</owners>
     <projectUrl>https://github.com/HangfireIO/Hangfire.Build</projectUrl>
-    <licenseUrl>https://raw.github.com/HangfireIO/Hangfire.Build/main/LICENSE.md</licenseUrl>
+    <license type="expression">MIT</license>
     <description>
       Psake tasks and functions to build Hangfire projects with ease.
     </description>
-    <copyright>Copyright © 2014 Hangfire OÜ</copyright>
+    <copyright>Copyright © 2014-2024 Hangfire OÜ</copyright>
     <tags>Hangfire Build Psake Powershell</tags>
     <releaseNotes>https://github.com/HangfireIO/Hangfire.Build/releases</releaseNotes>
     <dependencies>
