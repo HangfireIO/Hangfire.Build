@@ -1,5 +1,5 @@
 # AppVeyor CI build file, https://ci.appveyor.com/project/odinserj/hangfire
-version: 0.3.0-build-0{build}
+version: 0.3.1-build-0{build}
 
 #---------------------------------#
 #       build configuration       #
