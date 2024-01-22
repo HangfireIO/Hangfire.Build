@@ -8,7 +8,7 @@ Psake tasks and functions for building Hangfire projects with ease, including th
 * Create NuGet packages with all files you want to include.
 * Task to update common version of all projects in solution.
 * Target different frameworks (net45, netstandard1.*, etc).
-* Internalize assemblies with `ILMerge /internalize` (`ILMerge` NuGet package required).
+* Internalize assemblies with `ILRepack /internalize` (`ILRepack` NuGet package required).
 * Run unit and integration tests from the command line.
 * [AppVeyor](http://www.appveyor.com/) support – build version, pre-release packages for the [project feed](http://www.appveyor.com/docs/nuget#project-feeds) and simple build script.
 
@@ -46,35 +46,15 @@ For a full example, you can see the main [Hangfire repository](https://github.co
 
 For quick overview, sample Hangfire.Build project file is available [here](https://github.com/HangfireIO/Hangfire/blob/dev/psake-project.ps1). Tasks below provide only the base functionality.
 
-#### `Restore` task
-
-Required properties:
-
-```powershell
-Properties {
-    $solution = "Hangfire.sln"
-}
-```
-
-Restores all NuGet packages listed in projects in a solution. This is required when you attempt to build the solution and don't want to use MSBuild-Integrated Package restore as it is [not a recommended approach](http://docs.nuget.org/docs/reference/package-restore#MSBuild-Integrated_Package_Restore) since NuGet 2.7.
-
 #### `Clean` task
 
-Cleans the build folder and executes `msbuild /clean` for the solution if given.
+Cleans the build folder and executes `dotnet clean` for the with the given configuration.
 
 #### `Compile` task
 
-Required properties:
+Depends on: `Clean`.
 
-```powershell
-Properties {
-    $solution = "Hangfire.sln"
-}
-```
-
-Depends on: `Clean`, `Restore`.
-
-Simply build the given solution file, there is no magic here.
+Simply build all the projects in the current directory, with the `dotnet build` command and the given configuration. There is no magic here, except perhaps integration with AppVeyor.
 
 #### `Version` task
 
@@ -123,23 +103,23 @@ Run-OpenCover "Hangfire.SqlServer.Tests" $coverage_file $coverage_filter
 Run-OpenCover "Hangfire.SqlServer.Msmq.Tests" $coverage_file $coverage_filter
 ```
 
-#### `Merge-Assembly` function
+#### `Repack-Assembly` function
 
-Requires `ILMerge` NuGet package installed.
+Requires `ILRepack` NuGet package installed.
 
 Arguments:
 * *project*: String
 * *assemblyies*: Array of String – list of assembly names to internalize (with no `.dll` suffix).
 * *target*: String – target framework
 
-Invokes `ILMerge /internalize` to merge the given assemblies with the project's main assembly. Main assembly file is resolved as `.\src\{project}\bin\{target}\{configuration}\{project}.*`, `.\src\{project}\bin\{configuration}\{target}\{project}.*` or `.\src\{project}\bin\{configuration}\{project}.*`. It is assumed that merging assemblies are located under the same folder as a main assembly.
+Invokes `ILRepack /internalize` to merge the given assemblies with the project's main assembly. Main assembly file is resolved as `.\src\{project}\bin\{target}\{configuration}\{project}.*`, `.\src\{project}\bin\{configuration}\{target}\{project}.*` or `.\src\{project}\bin\{configuration}\{project}.*`. It is assumed that merging assemblies are located under the same folder as a main assembly.
 
 After merging, the original project assembly is being overwritted with the result assembly.
 
 Example:
 
 ```
-Merge-Assembly "Hangfire.Core" @("NCrontab", "CronExpressionDescriptor", "Microsoft.Owin")
+Repack-Assembly "Hangfire.Core" @("NCrontab", "CronExpressionDescriptor", "Microsoft.Owin")
 ```
 
 #### `Collect-*` functions
@@ -162,7 +142,7 @@ Arguments:
 * *nuspec* – nuspec filename without path and extension.
 * *version* – the version of a resulting package.
 
-This function executes `nuget pack nuspecs\{nuspec}.nuspec -Symbols` command and places the result into the build folder. Before running `NuGet.exe` executable, it replaces all `0.0.0` substrings in a given nuspec files and replaces them with the given version.
+This function executes `nuget pack nuspecs\{nuspec}.nuspec` command and places the result into the build folder. Before running `NuGet.exe` executable, it replaces all `%version%` substrings in a given nuspec files and replaces them with the given version. Starting from 0.3, it also replaces `%commit%` occurrences with the current commit hash to make source link work.
 
 Example:
 
