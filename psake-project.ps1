@@ -9,5 +9,5 @@ Task Collect -Depends Prepare -Description "Copy all artifacts to the build fold
 }
 
 Task Pack -Depends Collect -Description "Create NuGet package." {
-    Create-Package "Hangfire.Build" "0.3.2"
+    Create-Package "Hangfire.Build" "0.3.3"
 }
