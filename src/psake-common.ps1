@@ -26,11 +26,12 @@ Properties {
 
 ## Tasks
 
-Task CleanBuild -Description "Clean up the build directory." {
+Task Prepare -Description "Prepare and clean up the build directory." {
+    Write-Host "Preparing the build directory..." -ForegroundColor "Green"
     Clean-Directory $build_dir
 }
 
-Task Clean -Depends CleanBuild -Description "Clean up the project directories." {
+Task Clean -Depends Prepare -Description "Clean up the project directories." {
     Write-Host "Cleaning up the solution..." -ForegroundColor "Green"
     Exec { dotnet clean -c $config -nologo -verbosity:minimal }
 }
