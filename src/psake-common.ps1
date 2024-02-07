@@ -12,7 +12,6 @@ Properties {
     $nuget = "$base_dir/.nuget/nuget.exe"
     $ilrepack = "$package_dir/ilrepack.*/tools/ilrepack.exe"
     $xunit = "$package_dir/xunit.runners*/tools/xunit.console.clr4.exe"
-    $7zip = "$package_dir/7-Zip.CommandLine.*/tools/7za.exe"
     $opencover = "$package_dir/OpenCover.*/opencover.console.exe"
 
     ### AppVeyor-related
@@ -282,13 +281,7 @@ function Check-Version($version) {
 function Create-Archive($name) {
     Write-Host "Creating archive '$name.zip'..." -ForegroundColor "Green"
     Remove-Directory $temp_dir
-    Create-Zip "$build_dir/$name.zip" "$build_dir"
-}
-
-function Create-Zip($file, $dir){
-    if (Test-Path -path $file) { Remove-Item $file }
-    Create-Directory $dir
-    Exec { & $7zip a -mx -tzip $file $dir/* } 
+    Compress-Archive -Path "$build_dir/*" -DestinationPath "$build_dir/$name.zip"
 }
 
 ### Common functions
