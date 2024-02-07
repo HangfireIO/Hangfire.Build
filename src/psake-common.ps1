@@ -284,6 +284,11 @@ function Create-Archive($name) {
     Compress-Archive -Path "$build_dir/*" -DestinationPath "$build_dir/$name.zip"
 }
 
+function Unpack-Archive($name) {
+    Write-Host "Unpacking archive '$name.zip'..." -ForegroundColor "Green"
+    Expand-Archive -Path "$build_dir/$name.zip" -DestinationPath "$build_dir" -Force
+}
+
 ### Common functions
 
 function Create-Directory($dir) {
