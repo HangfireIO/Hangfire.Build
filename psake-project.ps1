@@ -18,5 +18,5 @@ Task Pack -Depends Collect -Description "Create NuGet package." {
 }
 
 Task Sign -Depends Pack -Description "Sign artifacts." {
-    Sign-ArchiveContents "Hangfire.Build-$version" "hangfire" "nuget-and-assemblies-in-zip-file"
+    Sign-ArchiveContents "Hangfire.Build-$version" "hangfire" "nuget-and-powershell-in-zip-file"
 }
