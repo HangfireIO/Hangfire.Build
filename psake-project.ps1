@@ -1,7 +1,7 @@
 Include "src\psake-common.ps1"
 
 Properties {
-    $version = "0.3.3"
+    $version = "0.4.0"
 }
 
 Task Default -Depends Pack
