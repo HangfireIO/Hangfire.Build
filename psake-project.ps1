@@ -1,5 +1,9 @@
 Include "src\psake-common.ps1"
 
+Properties {
+    $version = "0.3.3"
+}
+
 Task Default -Depends Pack
 
 Task Collect -Depends Prepare -Description "Copy all artifacts to the build folder." {
@@ -9,5 +13,10 @@ Task Collect -Depends Prepare -Description "Copy all artifacts to the build fold
 }
 
 Task Pack -Depends Collect -Description "Create NuGet package." {
-    Create-Package "Hangfire.Build" "0.3.3"
+    Create-Package "Hangfire.Build" "$version"
+    Create-Archive "Hangfire.Build-$version"
+}
+
+Task Sign -Depends Pack -Description "Sign artifacts." {
+    Sign-ArchiveContents "Hangfire.Build-$version" "hangfire" "nuget-and-assemblies-in-zip-file"
 }

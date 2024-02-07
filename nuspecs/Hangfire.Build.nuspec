@@ -4,8 +4,8 @@
     <id>Hangfire.Build</id>
     <version>%version%</version>
     <title>Hangfire.Build</title>
-    <authors>Hangfire Contributors</authors>
-    <owners>odinserj</owners>
+    <authors>Sergey Odinokov</authors>
+    <owners>HangfireIO, odinserj</owners>
     <projectUrl>https://github.com/HangfireIO/Hangfire.Build</projectUrl>
     <repository type="git" url="https://github.com/HangfireIO/Hangfire.Build.git" commit="%commit%" />
     <license type="expression">MIT</license>
