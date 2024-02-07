@@ -284,9 +284,27 @@ function Create-Archive($name) {
     Compress-Archive -Path "$build_dir/*" -DestinationPath "$build_dir/$name.zip"
 }
 
-function Unpack-Archive($name) {
-    Write-Host "Unpacking archive '$name.zip'..." -ForegroundColor "Green"
-    Expand-Archive -Path "$build_dir/$name.zip" -DestinationPath "$build_dir" -Force
+### Signing functions
+# Requires Install-Module -Name SignPath, please see https://about.signpath.io/documentation/powershell/
+
+function Sign-ArchiveContents($name, $project, $configuration) {
+    $policy = "test-signing-policy"
+
+    if ($env:APPVEYOR_REPO_TAG -eq "True") {
+        $policy = "release-signing-policy"
+    }
+
+    Write-Host "Using signing project '$project'..." -ForegroundColor "DarkGray"
+    Write-Host "Using signing policy '$policy'..." -ForegroundColor "DarkGray"
+    Write-Host "Using artifacts configuration '$configuration'..." -ForegroundColor "DarkGray"
+
+    $archive = "$build_dir/$name.zip"
+
+    Write-Host "Submitting archive '$archive' for signing..." -ForegroundColor "Green"
+    Submit-SigningRequest -InputArtifactPath "$archive" -OrganizationId $env:SIGNPATH_ORGANIZATION_ID -ApiToken $env:SIGNPATH_API_TOKEN -ProjectSlug "$project" -SigningPolicySlug "$policy" -ArtifactConfigurationSlug "$configuration" -WaitForCompletion -OutputArtifactPath "$archive" -Force
+
+    Write-Host "Unpacking signed files..." -ForegroundColor "Green"
+    Expand-Archive -Path "$archive" -DestinationPath "$build_dir" -Force -PassThru
 }
 
 ### Common functions
