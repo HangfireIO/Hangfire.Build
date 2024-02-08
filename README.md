@@ -155,13 +155,24 @@ Create-Package "Hangfire.Build" "0.1.0"
 Arguments:
 * *name* – file name for resulting archive, excluding path and extension.
 
-Generates a zip archive with all files in the build folder with the given name.
+Generates a zip archive with all files in the build folder with the given name. Since version 0.4.0 it uses PowerShell's built-in [`Compress-Archive`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.archive/compress-archive) cmdlet, so don't require external executables.
 
 Example:
 
 ```
 Create-Archive "Hangfire-$version"
 ```
+
+#### `Sign-ArchiveContents` function
+
+Arguments:
+* *name* – file name of an archive, excluding path and extension.
+* *project* - signing project slug on SignPath.
+* *configuration* – artifacts configuration slug on SignPath.
+
+Submits the given archive created with the `Create-Archive` function to SignPath for signing with the given project and artifacts configuration. For tag-based builds, signing policy name is `release-signing-policy`, for other builds, signing policy is `test-signing-policy`.
+
+The command is synchronous and waits for the signing to be completed. After signing, a signed archive is automatically downloaded and extracted with replacing all the files in the `{build_dir}` directory with the signed ones.
 
 #### `Get-SharedVersion` function
 
