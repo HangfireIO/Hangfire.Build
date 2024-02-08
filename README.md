@@ -73,7 +73,7 @@ Executes XUnit runner for the given project. This function assumes that common p
 
 Example:
 
-```
+```powershell
 Run-XunitTests "Hangfire.Core.Tests"
 ```
 
@@ -92,7 +92,7 @@ Resulting coverage file is merged with an existing one, so you can use multiple 
 
 Example:
 
-```
+```powershell
 $coverage_file = "coverage.xml"
 $coverage_filter = "+[Hangfire.*]* -[*.Tests]* -[*]*.Annotations.* -[*]*.Dashboard.* -[*]*.Logging.* -[*]*.ExpressionUtil.*"
 
@@ -118,7 +118,7 @@ After merging, the original project assembly is being overwritted with the resul
 
 Example:
 
-```
+```powershell
 Repack-Assembly "Hangfire.Core" @("NCrontab", "CronExpressionDescriptor", "Microsoft.Owin")
 ```
 
@@ -146,7 +146,7 @@ This function executes `nuget pack nuspecs\{nuspec}.nuspec` command and places t
 
 Example:
 
-```
+```powershell
 Create-Package "Hangfire.Build" "0.1.0"
 ```
 
@@ -159,7 +159,7 @@ Generates a zip archive with all files in the build folder with the given name. 
 
 Example:
 
-```
+```powershell
 Create-Archive "Hangfire-$version"
 ```
 
@@ -173,6 +173,12 @@ Arguments:
 Submits the given archive created with the `Create-Archive` function to SignPath for signing with the given project and artifacts configuration. For tag-based builds, signing policy name is `release-signing-policy`, for other builds, signing policy is `test-signing-policy`.
 
 The command is synchronous and waits for the signing to be completed. After signing, a signed archive is automatically downloaded and extracted with replacing all the files in the `{build_dir}` directory with the signed ones.
+
+Example:
+
+```powershell
+Sign-ArchiveContents "Hangfire-$version" "hangfire" "zip-file-configuration"
+```
 
 #### `Get-SharedVersion` function
 
