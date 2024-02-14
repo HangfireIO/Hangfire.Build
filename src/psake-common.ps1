@@ -294,6 +294,10 @@ function Sign-ArchiveContents($name, $project, $configuration) {
         $policy = "release-signing-policy"
     }
 
+    if ($configuration -eq $null) {
+        $configuration = "initial"
+    }
+
     Write-Host "Using signing project '$project'..." -ForegroundColor "DarkGray"
     Write-Host "Using signing policy '$policy'..." -ForegroundColor "DarkGray"
     Write-Host "Using artifacts configuration '$configuration'..." -ForegroundColor "DarkGray"

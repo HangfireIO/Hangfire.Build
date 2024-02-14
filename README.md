@@ -168,7 +168,7 @@ Create-Archive "Hangfire-$version"
 Arguments:
 * *name* – file name of an archive, excluding path and extension.
 * *project* - signing project slug on SignPath.
-* *configuration* – artifacts configuration slug on SignPath.
+* *configuration* – artifacts configuration slug on SignPath (default value: `initial`).
 
 Submits the given archive created with the `Create-Archive` function to SignPath for signing with the given project and artifacts configuration. For tag-based builds, signing policy name is `release-signing-policy`, for other builds, signing policy is `test-signing-policy`.
 
