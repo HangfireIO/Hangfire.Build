@@ -3,7 +3,7 @@ Hangfire.Build
 
 [![Build status](https://ci.appveyor.com/api/projects/status/8q3bq9egdknbe637?svg=true)](https://ci.appveyor.com/project/odinserj/hangfire-build)
 
-Psake tasks and functions for building Hangfire projects with ease, including the following tasks:
+[Psake](https://github.com/psake/psake) tasks and functions for building Hangfire projects with ease, including the following tasks:
 
 * Create NuGet packages with all files you want to include.
 * Task to update common version of all projects in solution.
@@ -17,10 +17,10 @@ Please see the Hangfire's [`psake-project.ps1`](https://github.com/HangfireIO/Ha
 Installation
 -------------
 
-This project is being distributed as a solution-level NuGet package, so open your Package Manager Console window and execute the following command.
+This project is being distributed as a solution-level NuGet package, so open your Package Manager Console window and execute the following command. It needs to be installed into solution folder in order to make it possible to reference its `psake-common.ps1` file from the build scripts of the current project.
 
-```
-PM> Install-Package Hangfire.Build
+```powershell
+> dotnet add package Hangfire.Build --package-directory packages
 ```
 
 After installing, there are some things to be done. Please go to the `packages\Hangfire.Build.*\tools` folder and copy the following files to the **project root folder**:
