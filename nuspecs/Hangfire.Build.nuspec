@@ -16,7 +16,11 @@
     <readme>README.md</readme>
     <icon>icon.png</icon>
     <tags>Hangfire Build Psake Powershell</tags>
-    <releaseNotes>https://github.com/HangfireIO/Hangfire.Build/releases</releaseNotes>
+    <releaseNotes>https://github.com/HangfireIO/Hangfire.Build/releases
+
+0.4.2
+• Added – Readme file and icon for the Hangfire.Build NuGet package.
+    </releaseNotes>
     <dependencies>
       <dependency id="psake" version="4.4.1" />
     </dependencies>
