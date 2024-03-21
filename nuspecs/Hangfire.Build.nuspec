@@ -17,6 +17,8 @@
     <icon>icon.png</icon>
     <tags>Hangfire Build Psake Powershell</tags>
     <releaseNotes>https://github.com/HangfireIO/Hangfire.Build/releases
+0.4.3
+• Changed – Skip submitting an archive for signing in pull requests, because secrets aren't available. 
 
 0.4.2
 • Added – Readme file and icon for the Hangfire.Build NuGet package.
