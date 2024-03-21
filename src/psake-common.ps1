@@ -288,6 +288,11 @@ function Create-Archive($name) {
 # Requires Install-Module -Name SignPath, please see https://about.signpath.io/documentation/powershell/
 
 function Sign-ArchiveContents($name, $project, $configuration) {
+    if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+        Write-Host "Signing is skipped, because the required secrets are unavailable in pull requests for security reasons" -ForegroundColor "Yellow"
+        return
+    }
+
     $policy = "test-signing-policy"
 
     if ($env:APPVEYOR_REPO_TAG -eq "True") {
