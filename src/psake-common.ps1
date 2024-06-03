@@ -352,7 +352,7 @@ function Move-Files($source, $destination) {
 }
 
 function Replace-Content($file, $pattern, $substring) {
-    (gc $file) -Replace $pattern, $substring | sc $file
+    (Get-Content $file) -Replace $pattern, $substring | Set-Content $file
 }
 
 function Get-SrcOutputDir($project, $target) {
