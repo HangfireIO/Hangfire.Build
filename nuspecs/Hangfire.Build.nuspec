@@ -17,6 +17,10 @@
     <icon>icon.png</icon>
     <tags>Hangfire Build Psake Powershell</tags>
     <releaseNotes>https://github.com/HangfireIO/Hangfire.Build/releases
+0.4.4
+• Changes — The `build.bat` file is now based on the newest PowerShell.
+• Fixed — Use `Get-Content` and `Set-Content` cmdlets explicitly to make scripts work with the newest PowerShell.
+
 0.4.3
 • Changed – Skip submitting an archive for signing in pull requests, because secrets aren't available. 
 

@@ -1,7 +1,8 @@
 Include "src\psake-common.ps1"
 
 Properties {
-    $version = "0.4.3"
+    # Please don't forget to update the `appveyor.yml` file as well
+    $version = "0.4.4"
 }
 
 Task Default -Depends Pack
