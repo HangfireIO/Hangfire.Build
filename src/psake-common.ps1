@@ -168,7 +168,7 @@ function Collect-Localizations($project, $target) {
     Write-Host "Collecting localizations for '$target/$project'..." -ForegroundColor "Green"
     
     $output = (Get-SrcOutputDir $project $target)
-    $dirs = Get-ChildItem -Path $output -Directory
+    $dirs = Get-ChildItem -Path $output -Directory -Name
 
     foreach ($dir in $dirs) {
         $source = "$output/$dir/$project.resources.dll"
