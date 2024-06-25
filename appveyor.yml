@@ -5,7 +5,7 @@
 #---------------------------------#
 
 # Please don't forget to update the `psake-project.ps1` file as well
-version: 0.4.4-build-0{build}
+version: 0.4.5-build-0{build}
 
 environment:
   SIGNPATH_API_TOKEN:
