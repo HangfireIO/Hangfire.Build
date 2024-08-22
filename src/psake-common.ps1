@@ -35,7 +35,12 @@ Task Clean -Depends Prepare -Description "Clean up the project directories." {
     Exec { dotnet clean -c $config -nologo -verbosity:minimal }
 }
 
-Task Compile -Depends Clean -Description "Compile all the projects in a solution." {
+Task Restore -Depends Clean -Description "Restores all dependencies in a solution." {
+    Write-Host "Restoring dependencies for the solution..." -ForegroundColor "Green"
+    Exec { dotnet restore --locked-mode }
+}
+
+Task Compile -Depends Restore -Description "Compile all the projects in a solution." {
     Write-Host "Compiling the solution..." -ForegroundColor "Green"
 
     $extra = $null
@@ -43,7 +48,7 @@ Task Compile -Depends Clean -Description "Compile all the projects in a solution
     #    $extra = "-logger:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
     #}
 
-    Exec { dotnet build -c $config -nologo -verbosity:minimal $extra }
+    Exec { dotnet build --no-restore -c $config -nologo -verbosity:minimal $extra }
 }
 
 Task Version -Description "Patch AssemblyInfo and AppVeyor version files." {
