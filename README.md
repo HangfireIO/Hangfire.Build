@@ -50,11 +50,17 @@ For quick overview, sample Hangfire.Build project file is available [here](https
 
 Cleans the build folder and executes `dotnet clean` for the with the given configuration.
 
-#### `Compile` task
+#### `Restore` task
 
 Depends on: `Clean`.
 
-Simply build all the projects in the current directory, with the `dotnet build` command and the given configuration. There is no magic here, except perhaps integration with AppVeyor.
+Restores all the dependencies for all the projects in the current directory with the `dotnet restore` command with `--locked-mode` switch to ensure lock file is used.
+
+#### `Compile` task
+
+Depends on: `Restore`.
+
+Simply build all the projects in the current directory, with the `dotnet build` command and the given configuration. There is no magic here, except perhaps possible integration with AppVeyor. This task explicitly passes the `--no-restore` switch, because depends on the explicit restore called in the `Restore` task.
 
 #### `Version` task
 

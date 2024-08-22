@@ -17,11 +17,16 @@
     <icon>icon.png</icon>
     <tags>Hangfire Build Psake Powershell</tags>
     <releaseNotes>https://github.com/HangfireIO/Hangfire.Build/releases
+
+0.5.0
+• Added — Explicit `Restore` task to ensure all the packages are restored before building.
+• Changed — `Build` task now depends on the new `Restore` task and passes `--no-restore` switch to `dotnet build`.
+
 0.4.5
 • Fixed — Fix broken `Collect-Localizations` function after migrating to PowerShell 7+.
 
 0.4.4
-• Changes — The `build.bat` file is now based on the newest PowerShell.
+• Changed — The `build.bat` file is now based on the newest PowerShell.
 • Fixed — Use `Get-Content` and `Set-Content` cmdlets explicitly to make scripts work with the newest PowerShell.
 
 0.4.3
