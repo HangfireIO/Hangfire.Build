@@ -32,7 +32,7 @@ Task Prepare -Description "Prepare and clean up the build directory." {
         $version = Get-SemanticVersion
         if ($version) {
             Write-Host "Updating AppVeyor build version to '$version'..."
-            Update-AppveyorBuild -Version $version
+            appveyor UpdateBuild -Version $version
         }
     }
     Write-Host "Preparing the build directory..." -ForegroundColor "Green"
