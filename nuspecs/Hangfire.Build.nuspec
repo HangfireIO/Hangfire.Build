@@ -12,7 +12,7 @@
     <description>
       Psake tasks and functions to build Hangfire projects with ease.
     </description>
-    <copyright>Copyright © 2014-2024 Hangfire OÜ</copyright>
+    <copyright>Copyright © 2014-2025 Hangfire OÜ</copyright>
     <readme>README.md</readme>
     <icon>icon.png</icon>
     <tags>Hangfire Build Psake Powershell</tags>
@@ -44,6 +44,6 @@
 	  <file src="Tools\psake-common.ps1" target="tools" />
     <file src="Tools\psake-project.ps1" target="tools" />
     <file src="README.md" />
-    <file src="..\nuspecs\icon.png" />
+    <file src="icon.png" />
   </files>
 </package>

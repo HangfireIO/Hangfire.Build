@@ -7,6 +7,7 @@ Task Collect -Depends Prepare -Description "Copy all artifacts to the build fold
     Collect-Tool "src\psake-project.ps1"
     Collect-Tool "build.bat"
     Collect-File "README.md"
+    Collect-File "icon.png"
 }
 
 Task Pack -Depends Collect -Description "Create NuGet package." {
