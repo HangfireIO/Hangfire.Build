@@ -4,7 +4,7 @@
 #    environment configuration    #
 #---------------------------------#
 
-version: {build}
+version: "{build}"
 
 environment:
   SIGNPATH_API_TOKEN:
