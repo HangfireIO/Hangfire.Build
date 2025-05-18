@@ -249,6 +249,9 @@ function Get-SemanticVersion {
 
         if ($env:APPVEYOR_BUILD_NUMBER) {
             $versionSuffix = "build." + $env:APPVEYOR_BUILD_NUMBER
+            if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+                $versionSuffix += ".pr.$env:APPVEYOR_PULL_REQUEST_NUMBER"
+            }
             Write-Host "Using CI build suffix '$versionSuffix'..." -ForegroundColor "Green"
         }
 

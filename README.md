@@ -199,11 +199,11 @@ Reads `VersionPrefix` and `VersionSuffix` tags from the `$base_dir\Directory.bui
 `VersionPrefix` contains 3-digit version, like `3.1.2`, `VersionSuffix` contains pre-release suffix, like `alpha.4`.
 
 1. In tag-based builds, if the tag name starts with the `v{VersionPrefix}` value, then the tag name is returned without the `v` prefix. E.g. if tag name is `v3.1.5-alpha.3`, then `3.1.5-alpha.3` version will be returned.
-2. For regular CI builds, the `VersionSuffix` is overridden with the `build.{BuildNumber}` value, regardless of the previous one.
+2. For regular CI builds, the `VersionSuffix` is overridden with the `build.{BuildNumber}` value, regardless of the previous one. When building a pull requests, the version suffix will also append its information, so the resulting suffix will be `build.{BuildNumber}.pr.{PRNumber}` to distinguish pull requests.
 
 For local builds, the rules above do not apply. 
 
-`VersionPrefix` and `VersionSuffix` are combined together to form a semantic version, like `5.2.6`, `5.2.6-beta.1`, or `0.5.0-build.1322`.
+`VersionPrefix` and `VersionSuffix` are combined together to form a semantic version, like `5.2.6`, `5.2.6-beta.1`, `0.5.0-build.1322`, or `0.5.0-build.1323.pr.13`.
 
 #### `Get-SharedVersion` function
 
