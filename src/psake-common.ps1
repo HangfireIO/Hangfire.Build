@@ -27,6 +27,14 @@ Properties {
 ## Tasks
 
 Task Prepare -Description "Prepare and clean up the build directory." {
+    if ($appVeyor) {
+        Write-Host "Trying to determine the semantic version for AppVeyor build..."
+        $version = Get-SemanticVersion
+        if ($version) {
+            Write-Host "Updating AppVeyor build version to '$version'..."
+            Update-AppveyorBuild -Version $version
+        }
+    }
     Write-Host "Preparing the build directory..." -ForegroundColor "Green"
     Clean-Directory $build_dir
 }

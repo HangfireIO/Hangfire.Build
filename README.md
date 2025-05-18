@@ -48,7 +48,7 @@ For quick overview, sample Hangfire.Build project file is available [here](https
 
 #### `Prepare` task
 
-Cleans the build folder recursively from all files.
+Cleans the build folder recursively from all files. For AppVeyor-based builds also tries to determine the current build version by calling the `Get-SemanticVersion` function, and calls the `Update-AppveyorBuild` cmdlet if it's not null.
 
 #### `Clean` task
 
