@@ -46,9 +46,15 @@ For a full example, you can see the main [Hangfire repository](https://github.co
 
 For quick overview, sample Hangfire.Build project file is available [here](https://github.com/HangfireIO/Hangfire/blob/dev/psake-project.ps1). Tasks below provide only the base functionality.
 
+#### `Prepare` task
+
+Cleans the build folder recursively from all files.
+
 #### `Clean` task
 
-Cleans the build folder and executes `dotnet clean` for the with the given configuration.
+Depends on: `Prepare`.
+
+ Executes `dotnet clean` for the the given configuration.
 
 #### `Restore` task
 
@@ -185,6 +191,19 @@ Example:
 ```powershell
 Sign-ArchiveContents "Hangfire-$version" "hangfire" "zip-file-configuration"
 ```
+
+#### `Get-SemanticVersion` function
+
+Reads `VersionPrefix` and `VersionSuffix` tags from the `$base_dir\Directory.build.props` file and performs the following calculations to determine the semantic version when build is performed in AppVeyor. If no `VersionPrefix` value is specified in the file above, then `1.0.0` is used, the default value for `VersionSuffix` is `$null`.
+
+`VersionPrefix` contains 3-digit version, like `3.1.2`, `VersionSuffix` contains pre-release suffix, like `alpha.4`.
+
+1. In tag-based builds, if the tag name starts with the `v{VersionPrefix}` value, then the tag name is returned without the `v` prefix. E.g. if tag name is `v3.1.5-alpha.3`, then `3.1.5-alpha.3` version will be returned.
+2. For regular CI builds, the `VersionSuffix` is overridden with the `build.{BuildNumber}` value, regardless of the previous one.
+
+For local builds, the rules above do not apply. 
+
+`VersionPrefix` and `VersionSuffix` are combined together to form a semantic version, like `5.2.6`, `5.2.6-beta.1`, or `0.5.0-build.1322`.
 
 #### `Get-SharedVersion` function
 

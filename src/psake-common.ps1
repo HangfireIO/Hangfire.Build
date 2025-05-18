@@ -21,6 +21,7 @@ Properties {
     ### Project information
     $config = "Release"    
     $sharedAssemblyInfo = "$src_dir/SharedAssemblyInfo.cs"
+    $directoryBuildProps = "$base_dir/Directory.build.props"
 }
 
 ## Tasks
@@ -221,6 +222,36 @@ function Create-Package($project, $version) {
 }
 
 ### Version functions
+
+function Get-SemanticVersion {
+    $xml = [xml](Get-Content $directoryBuildProps)
+    $versionPrefixNode = $xml.SelectSingleNode('Project/PropertyGroup/VersionPrefix')
+    $versionSuffixNode = $xml.SelectSingleNode('Project/PropertyGroup/VersionSuffix')
+
+    $versionPrefix = if ($versionPrefixNode) { $versionPrefixNode.InnerText } else { '1.0.0' }
+    $versionSuffix = if ($versionSuffixNode) { $versionSuffixNode.InnerText } else { $null }
+
+    $tag = $env:APPVEYOR_REPO_TAG_NAME
+    if ($tag -And $tag.StartsWith("v$versionPrefix")) {
+        $version = $tag.Substring(1)
+        Write-Host "Using tag-based version '$version' for packages..." -ForegroundColor "Green"
+        return $version
+    }
+
+    if ($env:APPVEYOR_BUILD_NUMBER) {
+        $versionSuffix = "build." + $env:APPVEYOR_BUILD_NUMBER
+        Write-Host "Using CI build suffix '$versionSuffix'..." -ForegroundColor "Green"
+    }
+
+    if ($versionPrefix) {
+        if ($versionSuffix) {
+            return $versionPrefix + '-' + $versionSuffix
+        }
+        return $versionPrefix
+    }
+
+    return $null;
+}
 
 function Get-PackageVersion {
     $version = Get-BuildVersion
