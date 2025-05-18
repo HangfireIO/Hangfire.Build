@@ -1,10 +1,5 @@
 Include "src\psake-common.ps1"
 
-Properties {
-    # Please don't forget to update the `appveyor.yml` file as well
-    $version = "0.5.0"
-}
-
 Task Default -Depends Pack
 
 Task Collect -Depends Prepare -Description "Copy all artifacts to the build folder." {
@@ -15,6 +10,7 @@ Task Collect -Depends Prepare -Description "Copy all artifacts to the build fold
 }
 
 Task Pack -Depends Collect -Description "Create NuGet package." {
+    $version = Get-SemanticVersion
     Create-Package "Hangfire.Build" "$version"
     Create-Archive "Hangfire.Build-$version"
 }
