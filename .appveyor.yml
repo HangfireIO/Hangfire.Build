@@ -1,4 +1,4 @@
-# AppVeyor CI build file, https://ci.appveyor.com/project/odinserj/hangfire
+# AppVeyor CI build file, https://ci.appveyor.com/project/HangfireIO/hangfire-build
 
 #---------------------------------#
 #    environment configuration    #
