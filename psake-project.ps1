@@ -16,5 +16,6 @@ Task Pack -Depends Collect -Description "Create NuGet package." {
 }
 
 Task Sign -Depends Pack -Description "Sign artifacts." {
+    $version = Get-SemanticVersion
     Sign-ArchiveContents "Hangfire.Build-$version" "hangfire" "nuget-and-powershell-in-zip-file"
 }
