@@ -17,6 +17,10 @@
     <icon>icon.png</icon>
     <tags>Hangfire Build Psake Powershell</tags>
     <releaseNotes>https://github.com/HangfireIO/Hangfire.Build/releases
+0.6.0
+• Added — `Get-SemanticVersion` function to work with `VersionPrefix` and `VersionSuffix` in `Directory.build.props`.
+• Added — Determine and update build version on AppVeyor automatically based on `Get-SemanticVersion`.
+• Changed — Remove `odinserj` from owners list of the NuGet package.
 
 0.5.0
 • Added — Explicit `Restore` task to ensure all the packages are restored before building.
